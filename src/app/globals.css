@@ -206,6 +206,29 @@
     border-color: var(--color-rose);
     box-shadow: 0 0 0 4px rgb(184 118 79 / 0.15);
   }
+  /* Phone number field with country picker (react-phone-number-input) */
+  .phone-field {
+    --PhoneInputCountryFlag-height: 1em;
+    --PhoneInputCountrySelectArrow-color: var(--color-muted);
+    --PhoneInput-color--focus: var(--color-rose);
+    display: flex;
+    align-items: center;
+  }
+  .phone-field:focus-within {
+    border-color: var(--color-rose);
+    box-shadow: 0 0 0 4px rgb(184 118 79 / 0.15);
+  }
+  .phone-field .PhoneInputInput {
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    outline: none;
+  }
+  .phone-field .PhoneInputCountrySelect {
+    color: #1d1b19; /* the native country list is always light */
+  }
   .field-label {
     display: block;
     margin-bottom: 0.4rem;

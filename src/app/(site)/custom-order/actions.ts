@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { z } from "zod";
 import { store } from "@/lib/store";
 import { readImage } from "@/lib/images";
@@ -11,10 +12,12 @@ export type RequestFormState = { ok: boolean; error?: string; fieldErrors?: Reco
 
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(80),
+  // Sent by the form in international format ("+94771234567"); checked against each country's real number rules.
   phone: z
     .string()
     .trim()
-    .regex(/^[+\d][\d\s-]{8,18}$/, "Please enter a valid WhatsApp number"),
+    .max(24)
+    .refine((v) => parsePhoneNumberFromString(v)?.isValid() === true, "Please enter a valid WhatsApp number"),
   email: z.union([z.literal(""), z.string().trim().email("Please enter a valid email").max(120)]),
   categoryId: z.string().max(60).optional(),
   description: z.string().trim().min(10, "Tell us a little more about your idea").max(2000),
@@ -71,6 +74,7 @@ export async function submitCustomRequest(_prev: RequestFormState, formData: For
   const request: CustomRequest = {
     id: randomUUID(),
     ...parsed.data,
+    phone: parsePhoneNumberFromString(parsed.data.phone)?.number ?? parsed.data.phone,
     email: parsed.data.email || undefined,
     images,
     status: "new",

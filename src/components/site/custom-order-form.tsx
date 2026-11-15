@@ -2,6 +2,8 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { submitCustomRequest, type RequestFormState } from "@/app/(site)/custom-order/actions";
 import { compressImage } from "@/lib/compress-image";
 import { whatsappLink } from "@/lib/format";
@@ -20,6 +22,19 @@ export function CustomOrderForm({
   const [previews, setPreviews] = useState<Preview[]>([]);
   const [imgError, setImgError] = useState("");
   const [compressing, setCompressing] = useState(false);
+  // WhatsApp number in international format, e.g. "+94771234567"
+  const [phone, setPhone] = useState<string | undefined>();
+  const [phoneError, setPhoneError] = useState("");
+
+  const checkPhone = () => {
+    const problem = !phone
+      ? "Please enter your WhatsApp number"
+      : isValidPhoneNumber(phone)
+        ? ""
+        : "This number is not valid for the selected country";
+    setPhoneError(problem);
+    return !problem;
+  };
 
   const [state, action, pending] = useActionState<RequestFormState, FormData>(
     async (prev, formData) => {
@@ -86,6 +101,7 @@ export function CustomOrderForm({
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
+        if (!checkPhone()) return;
         const fd = new FormData(e.currentTarget);
         startTransition(() => action(fd));
       }}
@@ -102,9 +118,29 @@ export function CustomOrderForm({
         <Field label="Your name *" error={err.name}>
           <input name="name" className="field" autoComplete="name" required maxLength={80} />
         </Field>
-        <Field label="WhatsApp number *" error={err.phone}>
-          <input name="phone" className="field" type="tel" inputMode="tel" autoComplete="tel" placeholder="07X XXX XXXX" required />
-        </Field>
+        <div>
+          <label htmlFor="request-phone" className="field-label">WhatsApp number *</label>
+          {/* Country picker with every country code; Sri Lanka is preselected. */}
+          <PhoneInput
+            id="request-phone"
+            international
+            defaultCountry="LK"
+            countryCallingCodeEditable={false}
+            value={phone}
+            onChange={(v) => {
+              setPhone(v);
+              if (phoneError) setPhoneError("");
+            }}
+            onBlur={() => phone && checkPhone()}
+            autoComplete="tel"
+            className="field phone-field"
+            aria-invalid={Boolean(phoneError || err.phone)}
+          />
+          <input type="hidden" name="phone" value={phone ?? ""} />
+          {(phoneError || err.phone) && (
+            <span role="alert" className="mt-1.5 block text-xs text-red-700 dark:text-red-400">{phoneError || err.phone}</span>
+          )}
+        </div>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Email (optional)" error={err.email}>
