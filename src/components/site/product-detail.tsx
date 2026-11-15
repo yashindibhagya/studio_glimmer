@@ -13,12 +13,10 @@ export function ProductDetail({
   product,
   categoryName,
   whatsappNumber,
-  instagramUrl,
 }: {
   product: Product;
   categoryName?: string;
   whatsappNumber: string;
-  instagramUrl: string;
 }) {
   const { add, wishlist, toggleWish, ready } = useBag();
   const [active, setActive] = useState(0);
@@ -155,7 +153,6 @@ export function ProductDetail({
           <OrderButtons
             lines={[{ ...line, key: "now", qty }]}
             whatsappNumber={whatsappNumber}
-            instagramUrl={instagramUrl}
             primaryClass="btn-outline"
           />
         </div>

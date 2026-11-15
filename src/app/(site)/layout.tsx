@@ -20,7 +20,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
       <Footer settings={settings} categories={categories} />
-      <BagDrawer whatsappNumber={settings.whatsappNumber} instagramUrl={settings.instagramUrl} />
+      <BagDrawer whatsappNumber={settings.whatsappNumber} />
       <WhatsAppFloat number={settings.whatsappNumber} />
     </BagProvider>
   );

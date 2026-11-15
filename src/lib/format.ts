@@ -27,12 +27,6 @@ export function whatsappLink(number: string, text: string) {
   return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }
 
-/** Opens a direct-message chat with the shop's Instagram account (falls back to the profile link). */
-export function instagramDmLink(instagramUrl: string) {
-  const m = instagramUrl.match(/instagram\.com\/([A-Za-z0-9._]+)/i);
-  return m ? `https://ig.me/m/${m[1]}` : instagramUrl;
-}
-
 /** What the invoice link carries: only ids, quantities and choices. Names, photos and prices are looked up on the server. */
 export type OrderPayload = {
   ref: string;

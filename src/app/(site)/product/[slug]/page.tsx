@@ -63,7 +63,6 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
         product={product}
         categoryName={category?.name}
         whatsappNumber={settings.whatsappNumber}
-        instagramUrl={settings.instagramUrl}
       />
 
       {related.length > 0 && (

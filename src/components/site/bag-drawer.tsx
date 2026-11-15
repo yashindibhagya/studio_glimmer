@@ -10,7 +10,7 @@ import { Sparkle } from "./ornaments";
 import { OrderButtons } from "./order-buttons";
 import { OnNavigate } from "./pathname";
 
-export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: string; instagramUrl: string }) {
+export function BagDrawer({ whatsappNumber }: { whatsappNumber: string }) {
   const { lines, open, setOpen, setQty, removeLine } = useBag();
   const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
 
@@ -54,7 +54,7 @@ export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: st
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
             <Sparkle className="text-rose-light size-8" />
             <p className="font-display text-bronze text-2xl">Your bag is empty</p>
-            <p className="text-muted text-sm">Add a little sparkle — your order is sent to us on WhatsApp or Instagram in one tap.</p>
+            <p className="text-muted text-sm">Add a little sparkle — your order is sent to us on WhatsApp in one tap.</p>
             <Link href="/shop" className="btn-outline mt-2">Browse the shop</Link>
           </div>
         ) : (
@@ -101,9 +101,9 @@ export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: st
                 <span className="eyebrow">Estimated total</span>
                 <span className="font-display text-bronze text-2xl">{formatLKR(total)}</span>
               </div>
-              <p className="text-muted mt-1 text-xs">Delivery & final price are confirmed with you in the chat.</p>
+              <p className="text-muted mt-1 text-xs">Delivery & final price are confirmed with you on WhatsApp.</p>
               <div className="mt-5">
-                <OrderButtons lines={lines} whatsappNumber={whatsappNumber} instagramUrl={instagramUrl} />
+                <OrderButtons lines={lines} whatsappNumber={whatsappNumber} />
               </div>
             </div>
           </>

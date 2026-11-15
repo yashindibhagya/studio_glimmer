@@ -70,7 +70,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           {text("location", "Location line")}
         </div>
         <p className="text-muted text-xs">
-          Orders from the website are sent to this WhatsApp number. Until it&apos;s set, the order buttons open your Instagram instead.
+          Orders from the website are sent to this WhatsApp number. Until it&apos;s set, customers cannot place orders: the order button is replaced by a short notice.
         </p>
       </Card>
 
