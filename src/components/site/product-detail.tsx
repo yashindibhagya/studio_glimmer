@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Check, Heart, Minus, Plus, ShoppingBag, Sparkles, Truck, Hand } from "lucide-react";
 import type { Product } from "@/lib/types";
-import { buildOrderMessage, formatLKR, whatsappLink } from "@/lib/format";
+import { formatLKR } from "@/lib/format";
+import { OrderButtons } from "./order-buttons";
 import { useBag } from "./bag-context";
 import { ProductVisual } from "./product-visual";
-import { WhatsAppIcon } from "./whatsapp-icon";
 import { SparkleRule } from "./ornaments";
 
 export function ProductDetail({
@@ -47,11 +47,6 @@ export function ProductDetail({
     add(line, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  };
-
-  const orderNow = () => {
-    const text = buildOrderMessage([{ ...line, key: "now", qty }], window.location.origin);
-    window.open(whatsappNumber ? whatsappLink(whatsappNumber, text) : instagramUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -157,9 +152,12 @@ export function ProductDetail({
               <Heart className={`size-4 ${wished ? "fill-rose text-rose" : ""}`} strokeWidth={1.5} />
             </button>
           </div>
-          <button type="button" onClick={orderNow} className="btn-outline w-full">
-            <WhatsAppIcon className="size-4" /> {whatsappNumber ? "Order now on WhatsApp" : "Order now via Instagram"}
-          </button>
+          <OrderButtons
+            lines={[{ ...line, key: "now", qty }]}
+            whatsappNumber={whatsappNumber}
+            instagramUrl={instagramUrl}
+            primaryClass="btn-outline"
+          />
         </div>
 
         <ul className="border-line mt-10 grid gap-4 border-t pt-8 sm:grid-cols-3">

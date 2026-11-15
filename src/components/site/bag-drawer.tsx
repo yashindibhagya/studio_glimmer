@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { Minus, Plus, Trash2, X } from "lucide-react";
-import { buildOrderMessage, formatLKR, whatsappLink } from "@/lib/format";
+import { formatLKR } from "@/lib/format";
 import { useBag } from "./bag-context";
 import { ProductVisual } from "./product-visual";
 import { Sparkle } from "./ornaments";
-import { WhatsAppIcon } from "./whatsapp-icon";
+import { OrderButtons } from "./order-buttons";
 import { OnNavigate } from "./pathname";
 
 export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: string; instagramUrl: string }) {
@@ -24,13 +24,6 @@ export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: st
       document.body.style.overflow = "";
     };
   }, [open, setOpen]);
-
-  const checkout = () => {
-    const site = window.location.origin;
-    const text = buildOrderMessage(lines, site);
-    const url = whatsappNumber ? whatsappLink(whatsappNumber, text) : instagramUrl;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
 
   return (
     <div className={`fixed inset-0 z-50 ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open}>
@@ -61,7 +54,7 @@ export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: st
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
             <Sparkle className="text-rose-light size-8" />
             <p className="font-display text-bronze text-2xl">Your bag is empty</p>
-            <p className="text-muted text-sm">Add a little sparkle — your order is sent to us on WhatsApp in one tap.</p>
+            <p className="text-muted text-sm">Add a little sparkle — your order is sent to us on WhatsApp or Instagram in one tap.</p>
             <Link href="/shop" className="btn-outline mt-2">Browse the shop</Link>
           </div>
         ) : (
@@ -108,11 +101,10 @@ export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: st
                 <span className="eyebrow">Estimated total</span>
                 <span className="font-display text-bronze text-2xl">{formatLKR(total)}</span>
               </div>
-              <p className="text-muted mt-1 text-xs">Delivery & final price confirmed with you on WhatsApp.</p>
-              <button type="button" onClick={checkout} className="btn-primary mt-5 w-full">
-                <WhatsAppIcon className="size-4" />
-                {whatsappNumber ? "Order on WhatsApp" : "Order via Instagram"}
-              </button>
+              <p className="text-muted mt-1 text-xs">Delivery & final price are confirmed with you in the chat.</p>
+              <div className="mt-5">
+                <OrderButtons lines={lines} whatsappNumber={whatsappNumber} instagramUrl={instagramUrl} />
+              </div>
             </div>
           </>
         )}

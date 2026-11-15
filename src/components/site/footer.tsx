@@ -17,7 +17,7 @@ export function Footer({ settings, categories }: { settings: SiteSettings; categ
   ].filter((s) => s.href);
 
   return (
-    <footer className="bg-blush/60 border-line mt-auto border-t">
+    <footer className="print:hidden bg-blush/60 border-line mt-auto border-t">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-8 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
         <div className="flex flex-col items-center text-center md:items-start md:text-left">
           <Image src="/logo.webp" alt="Studio Glimmer — Custom Rhinestone Creations, since 2020" width={150} height={150} className="-my-3 logo-blend" />

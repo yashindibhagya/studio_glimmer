@@ -37,7 +37,7 @@ export function Header({ categories }: { categories: Pick<Category, "id" | "slug
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-300 ${
+      className={`print:hidden sticky top-0 z-40 transition-all duration-300 ${
         scrolled ? "bg-cream/90 shadow-[0_8px_30px_-20px_rgb(92_52_34/0.4)] backdrop-blur-md" : "bg-cream"
       }`}
     >
