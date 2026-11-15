@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Studio Glimmer palette — warm sand + black (matches the product photos: black fabric on sand), rose-gold accents from the logo */
+@theme {
+  --color-cream: #efe6d5; /* page: light sand */
+  --color-ivory: #f8f2e6; /* cards */
+  --color-blush: #e3d6bf; /* deeper sand */
+  --color-blush-deep: #d3c3a6;
+  --color-rose: #b8764f; /* rose gold */
+  --color-rose-deep: #8a4c31;
+  --color-rose-light: #e3b89c;
+  --color-bronze: #1d1b19; /* charcoal black, like the fabric */
+  --color-ink: #1d1b19;
+  --color-muted: #6b6152;
+  --color-line: #d6c8ae;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-script: var(--font-pinyon), "Pinyon Script", cursive;
+  --font-sans: var(--font-jost), "Jost", system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-twinkle: twinkle 3.2s ease-in-out infinite;
+  --animate-shimmer: shimmer 6s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-spin-slow: spin 22s linear infinite;
+  --animate-fade-up: fade-up 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.7) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(20deg); }
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+  ::selection {
+    background: var(--color-rose-light);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-rose);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Metallic rose-gold, like the logo ring */
+  .text-rose-gold {
+    background: linear-gradient(100deg, #8f5136 0%, #c48660 28%, #f1d0b8 45%, #b8764f 62%, #7a4630 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: var(--animate-shimmer);
+  }
+  .bg-rose-gold {
+    background: linear-gradient(120deg, #8f5136 0%, #b8764f 35%, #e0ae8e 55%, #b8764f 75%, #8f5136 100%);
+  }
+  .ring-rose-gold {
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(var(--color-cream), var(--color-cream)) padding-box,
+      linear-gradient(130deg, #8f5136, #f1d0b8, #b8764f, #f6dcc8, #8f5136) border-box;
+  }
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border-radius: 999px;
+    padding: 0.95rem 1.8rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #f8f2e6;
+    background: #1d1b19;
+    box-shadow: 0 10px 30px -14px rgb(29 27 25 / 0.7);
+    transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px -14px rgb(143 81 54 / 0.8);
+    background: linear-gradient(120deg, #8f5136, #b8764f 55%, #c98d68);
+  }
+  /* For buttons that sit on a black section */
+  .btn-primary.btn-gold {
+    background: linear-gradient(120deg, #8f5136, #b8764f 55%, #c98d68);
+    color: #fff;
+  }
+  .btn-primary.btn-gold:hover {
+    filter: brightness(1.08);
+  }
+  .btn-primary:disabled {
+    opacity: 0.6;
+    transform: none;
+    cursor: not-allowed;
+  }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border-radius: 999px;
+    padding: 0.9rem 1.7rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-bronze);
+    border: 1px solid var(--color-bronze);
+    transition: background 0.25s, color 0.25s;
+  }
+  .btn-outline:hover {
+    background: var(--color-bronze);
+    border-color: var(--color-bronze);
+    color: var(--color-cream);
+  }
+  .field {
+    width: 100%;
+    border-radius: 0.9rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-ivory);
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    color: var(--color-ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-rose);
+    box-shadow: 0 0 0 4px rgb(184 118 79 / 0.15);
+  }
+  .field-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .prose-glimmer p + p {
+    margin-top: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
