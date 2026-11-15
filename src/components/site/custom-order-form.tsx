@@ -92,9 +92,10 @@ export function CustomOrderForm({
     >
       <h2 className="font-display text-bronze text-3xl">Tell us your idea</h2>
 
-      {/* Honeypot (hidden from people, visible to bots) */}
+      {/* Spam trap: hidden from people, ticked by bots. A checkbox, because browser autofill never ticks one
+          (a hidden text field named "company" was being auto-filled, which silently dropped real requests). */}
       <div className="absolute -left-[9999px]" aria-hidden>
-        <label>Company <input name="company" tabIndex={-1} autoComplete="off" /></label>
+        <input type="checkbox" name="sg_trap" tabIndex={-1} />
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">

@@ -33,8 +33,8 @@ function rateLimited(ip: string) {
 }
 
 export async function submitCustomRequest(_prev: RequestFormState, formData: FormData): Promise<RequestFormState> {
-  // Honeypot: real people never fill this hidden field.
-  if (formData.get("company")) return { ok: true };
+  // Spam trap: a hidden checkbox real people never see or tick.
+  if (formData.get("sg_trap")) return { ok: true };
 
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
