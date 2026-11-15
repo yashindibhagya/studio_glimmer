@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AlertTriangle, ArrowRight, Inbox, Package, Plus, Star, Images } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { ensureSeeded, readSettings } from "@/lib/data";
-import { store, usingCloudinary, usingFirebase } from "@/lib/store";
+import { store, usingCloudinary } from "@/lib/store";
 import { Card, PageHeader, StatusPill } from "@/components/admin/ui";
 
 export const metadata = { title: "Dashboard" };
@@ -38,11 +38,9 @@ export default async function DashboardPage() {
       <PageHeader
         title="Welcome back ✨"
         description={
-          usingFirebase
+          usingCloudinary
             ? "Here's what's happening in your shop."
-            : usingCloudinary
-              ? "Photos are saved to Cloudinary. Products and other data are saved on this computer only."
-              : "Local mode — changes are saved on this computer only."
+            : "Local mode — changes are saved on this computer only."
         }
         action={
           <Link href="/admin/products/new" className="btn-primary !py-3">

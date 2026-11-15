@@ -1,34 +1,27 @@
 import "server-only";
 import type { Store } from "./types";
 import { localStore } from "./local";
-import { firebaseStore } from "./firebase";
 import * as cloudinary from "./cloudinary";
+import { cloudinaryData } from "./cloudinary-data";
 
-const FIREBASE_VARS = ["FIREBASE_PROJECT_ID", "FIREBASE_CLIENT_EMAIL", "FIREBASE_PRIVATE_KEY"];
 const CLOUDINARY_VARS = ["CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
-const missingFirebase = FIREBASE_VARS.filter((k) => !process.env[k]);
-const missingCloudinary = CLOUDINARY_VARS.filter((k) => !process.env[k]);
+const missing = CLOUDINARY_VARS.filter((k) => !process.env[k]);
 
-/** Data (products, requests, settings…) is in Firestore when its keys are set; otherwise local files in .data/. */
-export const usingFirebase = missingFirebase.length === 0;
-/** Photos go to Cloudinary when its keys are set; otherwise local files in .data/uploads. */
-export const usingCloudinary = missingCloudinary.length === 0;
+/**
+ * With the Cloudinary keys set, everything lives on Cloudinary: photos as images,
+ * and shop data (products, requests, settings…) as private JSON files.
+ * Without them, everything is kept in local files in .data/ (development only).
+ */
+export const usingCloudinary = missing.length === 0;
 
-if (process.env.VERCEL && (!usingFirebase || !usingCloudinary)) {
-  throw new Error(
-    `Firebase/Cloudinary not configured on Vercel. Missing: ${[...missingFirebase, ...missingCloudinary].join(", ")}`,
-  );
+if (process.env.VERCEL && !usingCloudinary) {
+  throw new Error(`Cloudinary is not configured on Vercel. Missing: ${missing.join(", ")}`);
 }
-for (const [name, vars, miss] of [
-  ["Firebase", FIREBASE_VARS, missingFirebase],
-  ["Cloudinary", CLOUDINARY_VARS, missingCloudinary],
-] as const) {
-  if (miss.length > 0 && miss.length < vars.length) {
-    console.warn(`[store] ${name} is partially configured — not using it. Missing: ${miss.join(", ")}`);
-  }
+if (missing.length > 0 && missing.length < CLOUDINARY_VARS.length) {
+  console.warn(`[store] Cloudinary is partially configured — not using it. Missing: ${missing.join(", ")}`);
 }
 
-const data = usingFirebase ? firebaseStore : localStore;
+const data = usingCloudinary ? cloudinaryData : localStore;
 
 export const store: Store = {
   list: data.list,

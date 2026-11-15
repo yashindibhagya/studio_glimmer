@@ -2,12 +2,12 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 /**
- * Image storage on Cloudinary (free plan, no card needed).
+ * Image storage on Cloudinary (free plan, no card needed). Shop data is in cloudinary-data.ts.
  * Uses Cloudinary's signed REST API directly, so no SDK is required.
  */
 const ROOT_FOLDER = "studio-glimmer";
 
-function config() {
+export function cloudinaryConfig() {
   const cloud = process.env.CLOUDINARY_CLOUD_NAME;
   const key = process.env.CLOUDINARY_API_KEY;
   const secret = process.env.CLOUDINARY_API_SECRET;
@@ -34,7 +34,7 @@ export function publicIdFromUrl(url: string) {
 }
 
 export async function uploadImage(bytes: Uint8Array, contentType: string, folder: string) {
-  const { cloud, key, secret } = config();
+  const { cloud, key, secret } = cloudinaryConfig();
   const params = { folder: `${ROOT_FOLDER}/${folder}`, timestamp: Math.floor(Date.now() / 1000) };
   const form = new FormData();
   form.append("file", new Blob([bytes as BlobPart], { type: contentType }));
@@ -52,7 +52,7 @@ export async function uploadImage(bytes: Uint8Array, contentType: string, folder
 export async function deleteImage(url: string) {
   const publicId = publicIdFromUrl(url);
   if (!publicId) return;
-  const { cloud, key, secret } = config();
+  const { cloud, key, secret } = cloudinaryConfig();
   const params = { public_id: publicId, timestamp: Math.floor(Date.now() / 1000) };
   const form = new FormData();
   form.append("public_id", publicId);

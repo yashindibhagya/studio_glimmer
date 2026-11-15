@@ -8,7 +8,7 @@ import type { Store } from "./types";
 /**
  * Development-only store: keeps everything in .data/db.json and uploaded
  * images in .data/uploads (served by the /uploads route).
- * Production uses Firebase + Cloudinary instead.
+ * Production uses Cloudinary instead.
  */
 const DATA_DIR = path.join(process.cwd(), ".data");
 const DB_FILE = path.join(DATA_DIR, "db.json");

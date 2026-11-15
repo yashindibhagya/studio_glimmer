@@ -9,7 +9,7 @@ npm install
 npm run dev        # http://localhost:3000   ·   admin: http://localhost:3000/admin
 ```
 
-Without Firebase/Cloudinary keys the site runs in **local mode**: data is saved in `.data/` on this computer. The two are independent: with only the Cloudinary keys set, photos go to Cloudinary while the data stays local. The admin login is in `.env.local` (email `admin@studioglimmer.lk`, password on the `# Dev password` line).
+Without the Cloudinary keys the site runs in **local mode**: data and photos are saved in `.data/` on this computer. With the keys set, both photos and shop data are saved on Cloudinary, so your computer and the live site show the same shop. The admin login is in `.env.local` (email `admin@studioglimmer.lk`, password on the `# Dev password` line).
 
 ## What's in the admin portal
 
@@ -26,37 +26,30 @@ Without Firebase/Cloudinary keys the site runs in **local mode**: data is saved 
 
 Every save updates the live website immediately.
 
-## Going live (Firebase + Cloudinary + Vercel — all free, no card needed)
+## Going live (Cloudinary + Vercel — both free, no card needed)
 
-1. **Firebase** (data) → [console.firebase.google.com](https://console.firebase.google.com) → *Add project* (Spark/free plan is fine).
-   - *Build → Firestore Database → Create database* → choose a location (e.g. `asia-south1`) → *production mode*.
-   - *Firestore → Rules*: paste `firestore.rules` from this project → *Publish*.
-   - *Project settings → Service accounts → Generate new private key*. This downloads a JSON file; keep it secret. From it you need `project_id`, `client_email` and `private_key`.
-2. **Cloudinary** (photos) → sign up at [cloudinary.com](https://cloudinary.com) (free plan) → *Dashboard*: copy **Cloud name**, **API Key** and **API Secret**.
-3. **Choose your real admin password** and hash it:
+1. **Cloudinary** (photos and data) → sign up at [cloudinary.com](https://cloudinary.com) (free plan) → *Dashboard*: copy **Cloud name**, **API Key** and **API Secret**.
+2. **Choose your real admin password** and hash it:
    ```bash
    npm run hash-password -- "your-strong-password"
    ```
-4. **Vercel** → import this project → add these Environment Variables:
+3. **Vercel** → import this project → add these Environment Variables:
    | Name | Value |
    |---|---|
-   | `FIREBASE_PROJECT_ID` | `project_id` from the JSON |
-   | `FIREBASE_CLIENT_EMAIL` | `client_email` from the JSON |
-   | `FIREBASE_PRIVATE_KEY` | `private_key` from the JSON, pasted exactly, including `-----BEGIN…` and the `\n`s |
    | `CLOUDINARY_CLOUD_NAME` | Cloud name |
    | `CLOUDINARY_API_KEY` | API Key |
    | `CLOUDINARY_API_SECRET` | API Secret |
    | `ADMIN_EMAIL` | your email |
-   | `ADMIN_PASSWORD_HASH` | hash from step 3 (paste as-is in Vercel) |
+   | `ADMIN_PASSWORD_HASH` | hash from step 2 (paste as-is in Vercel) |
    | `SESSION_SECRET` | output of `openssl rand -hex 32` |
    | `NEXT_PUBLIC_SITE_URL` | `https://studioglimmer.lk` (or your Vercel URL) |
-5. Deploy, connect your domain in Vercel → *Domains*, then open `/admin` and work through the **Before you launch** checklist. Starter content is created in Firestore automatically on the first visit.
+4. Deploy, connect your domain in Vercel → *Domains*, then open `/admin` and work through the **Before you launch** checklist. Starter content is created automatically on the first visit if no shop data exists yet.
 
-The build fails on purpose if Firebase/Cloudinary aren't configured on Vercel, so a site that can't save data can never go live by accident.
+The build fails on purpose if Cloudinary isn't configured on Vercel, so a site that can't save data can never go live by accident.
 
 ## Tech notes
 
 - Next.js 16 (App Router, Cache Components): public pages are cached and refreshed instantly through `updateTag` whenever the admin saves.
-- Data lives in Firestore, one collection per type (`products`, `categories`, `requests`, …). Only the server reads or writes it, through a service account; `firestore.rules` blocks all browser access. Photos go to Cloudinary under `studio-glimmer/…` using signed uploads, and the API secret never leaves the server.
+- Data lives on Cloudinary as private JSON files, one per type (`studio-glimmer/data/products.json`, `requests.json`, …). They can only be read with the API secret, and only the server reads or writes them. Every save rewrites that type's file, which suits one admin; two saves at the exact same moment from different servers could lose one of them. Photos go to Cloudinary under `studio-glimmer/…` using signed uploads, and the API secret never leaves the server.
 - Admin auth: one admin, bcrypt password hash in env, signed httpOnly session cookie (7 days), login lockout after 5 failed attempts. `src/proxy.ts` guards `/admin`, and every server action re-checks the session.
 - Uploads are resized to WebP in the browser, then the server checks the file signature (JPG/PNG/WebP only, max 3 MB).
