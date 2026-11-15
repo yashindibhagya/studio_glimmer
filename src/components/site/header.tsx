@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
 import type { Category } from "@/lib/types";
 import { useBag } from "./bag-context";
+import { ThemeToggle } from "./theme-toggle";
 import { Wordmark } from "./wordmark";
 import { Sparkle } from "./ornaments";
 import { OnNavigate, PathnameRender } from "./pathname";
@@ -56,6 +57,7 @@ export function Header({ categories }: { categories: Pick<Category, "id" | "slug
         <PathnameRender render={(pathname) => <DesktopNav pathname={pathname} />} />
 
         <div className="text-bronze flex items-center gap-1 sm:gap-2">
+          <ThemeToggle className="p-2 transition-colors hover:text-rose" />
           <Link href="/shop?focus=search" className="hidden p-2 transition-colors hover:text-rose sm:block" aria-label="Search products">
             <Search className="size-[1.15rem]" strokeWidth={1.5} />
           </Link>
@@ -81,7 +83,7 @@ export function Header({ categories }: { categories: Pick<Category, "id" | "slug
         aria-hidden={!menuOpen}
       >
         <div
-          className={`bg-ink/30 absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${menuOpen ? "opacity-100" : "opacity-0"}`}
+          className={`bg-black/40 absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${menuOpen ? "opacity-100" : "opacity-0"}`}
           onClick={() => setMenuOpen(false)}
         />
         <aside

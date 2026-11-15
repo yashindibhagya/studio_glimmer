@@ -20,7 +20,7 @@ export function PromoBar({ text }: { text: string }) {
 
   if (hidden || !text) return null;
   return (
-    <div className="bg-bronze text-cream relative px-10 py-2.5 text-center text-[0.68rem] tracking-[0.22em] uppercase">
+    <div className="keep-dark bg-bronze text-cream relative px-10 py-2.5 text-center text-[0.68rem] tracking-[0.22em] uppercase">
       {text}
       <button
         type="button"

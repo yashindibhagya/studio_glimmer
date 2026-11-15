@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, MessageCircle, PenLine, Gift } from "lucide-react";
-import { formatLKR } from "@/lib/format";
 import { getCategories, getFaqs, getGallery, getProducts, getReviews, getSettings } from "@/lib/data";
 import { ProductCard } from "@/components/site/product-card";
 import { ProductVisual } from "@/components/site/product-visual";
@@ -23,13 +22,15 @@ export default async function HomePage() {
   const catName = new Map(categories.map((c) => [c.id, c.name]));
   const withCat = <T extends { categoryId: string }>(p: T) => ({ ...p, categoryName: catName.get(p.categoryId) });
 
-  const newIn = [...products]
-    .sort((a, b) => Number(b.isNew) - Number(a.isNew) || b.createdAt.localeCompare(a.createdAt))
+  // Small catalogue: one short row, favourites first, then the newest pieces.
+  const picks = [...products]
+    .sort(
+      (a, b) =>
+        Number(b.featured) - Number(a.featured) || Number(b.isNew) - Number(a.isNew) || b.createdAt.localeCompare(a.createdAt),
+    )
     .slice(0, 4)
     .map(withCat);
-  const newIds = new Set(newIn.map((p) => p.id));
-  const featured = products.filter((p) => p.featured && !newIds.has(p.id)).slice(0, 4).map(withCat);
-  const spotlight = products.find((p) => p.featured) ?? products[0];
+  const galleryShots = gallery.slice(0, 3);
 
   return (
     <>
@@ -91,13 +92,10 @@ export default async function HomePage() {
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <div className="bg-blush relative aspect-[4/5] overflow-hidden rounded-[2.5rem] shadow-[0_45px_80px_-45px_rgb(29_27_25/0.6)] transition-transform duration-700 lg:rotate-[1.5deg] lg:hover:rotate-0">
               {settings.heroImage ? (
-                <>
-                  <Image src={settings.heroImage} alt="Studio Glimmer creation" fill priority sizes="(min-width: 1024px) 42vw, 92vw" className="object-cover" />
-                  <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" />
-                </>
+                <Image src={settings.heroImage} alt="Studio Glimmer creation" fill priority sizes="(min-width: 1024px) 42vw, 92vw" className="object-cover" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#fbf6ec_0%,#eee3cf_55%,#dccdb1_100%)]">
-                  <Image src="/logo.webp" alt="Studio Glimmer logo" width={420} height={420} priority className="-mt-10 w-[88%] mix-blend-multiply [mask-image:radial-gradient(circle_closest-side,black_84%,transparent_100%)]" />
+                <div className="absolute inset-0 flex items-center justify-center bg-placeholder">
+                  <Image src="/logo.webp" alt="Studio Glimmer logo" width={420} height={420} priority className="-mt-10 w-[88%] logo-blend [mask-image:radial-gradient(circle_closest-side,black_84%,transparent_100%)]" />
                 </div>
               )}
             </div>
@@ -122,25 +120,6 @@ export default async function HomePage() {
               <Diamond className="text-rose-light w-8" strokeWidth={1.4} />
             </div>
 
-            {/* Featured product card */}
-            {spotlight && (
-              <Link
-                href={`/product/${spotlight.slug}`}
-                className="group bg-ivory/85 absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-[1.4rem] border border-white/50 p-2.5 shadow-lg backdrop-blur-md transition hover:bg-ivory"
-              >
-                <span className="bg-blush relative size-14 shrink-0 overflow-hidden rounded-2xl">
-                  <ProductVisual src={spotlight.images[0]} alt="" sizes="56px" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="eyebrow block !text-[0.56rem]">Customer favourite</span>
-                  <span className="font-display text-bronze block truncate text-lg leading-tight">{spotlight.name}</span>
-                  <span className="text-rose-deep block text-xs">{formatLKR(spotlight.price)}</span>
-                </span>
-                <span className="bg-bronze text-cream mr-1 flex size-10 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:rotate-45">
-                  <ArrowUpRight className="size-4" />
-                </span>
-              </Link>
-            )}
           </div>
         </div>
       </section>
@@ -160,37 +139,47 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ---------- CATEGORIES ---------- */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:py-28">
+      {/* ---------- CATEGORIES (no photos needed) ---------- */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:py-24">
         <SectionTitle eyebrow="Shop by category" script="Find your" title="Sparkle" />
-        <div className="mt-14 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-5">
-          {categories.map((c, i) => {
-            const cover = c.image ?? products.find((p) => p.categoryId === c.id && p.images[0])?.images[0];
-            return (
-              <Link key={c.id} href={`/shop?category=${c.slug}`} className={`group text-center ${i === 4 ? "col-span-2 mx-auto w-1/2 md:col-span-1 md:w-full" : ""}`}>
-                <div className="bg-blush relative aspect-[3/4] overflow-hidden rounded-t-full rounded-b-3xl">
-                  <ProductVisual src={cover} alt={c.name} sizes="(min-width:1024px) 20vw, 45vw" className="transition-transform duration-700 group-hover:scale-105" />
-                </div>
-                <h3 className="font-display text-bronze mt-4 text-xl leading-tight transition-colors group-hover:text-rose-deep">{c.name}</h3>
-                <p className="text-muted mt-1 hidden text-xs sm:block">{c.tagline}</p>
-              </Link>
-            );
-          })}
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
+          {categories.map((c) => (
+            <Link
+              key={c.id}
+              href={`/shop?category=${c.slug}`}
+              className="group bg-ivory border-line hover:border-rose flex w-full items-center gap-4 rounded-3xl border p-5 transition hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-30px_rgb(29_27_25/0.5)] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.7rem)]"
+            >
+              <span className="bg-blush text-rose-deep flex size-12 shrink-0 items-center justify-center rounded-full">
+                <Sparkle className="size-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="font-display text-bronze block text-xl leading-tight">{c.name}</span>
+                {c.tagline && <span className="text-muted mt-0.5 block truncate text-xs">{c.tagline}</span>}
+              </span>
+              <ArrowUpRight className="text-bronze size-4 shrink-0 transition-transform duration-300 group-hover:rotate-45" />
+            </Link>
+          ))}
         </div>
       </section>
 
-      {/* ---------- NEW IN ---------- */}
-      <section className="bg-ivory py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-8">
-          <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-end">
-            <SectionTitle eyebrow="Fresh from the studio" script="New" title="Arrivals" align="left" />
-            <Link href="/shop?sort=new" className="btn-outline">View all <ArrowRight className="size-4" /></Link>
+      {/* ---------- COLLECTION ---------- */}
+      {picks.length > 0 && (
+        <section className="bg-ivory py-20 lg:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-8">
+            <SectionTitle eyebrow="Fresh from the studio" script="Our" title="Collection" />
+            <div className="mt-12 flex flex-wrap justify-center gap-x-4 gap-y-12 sm:gap-x-6">
+              {picks.map((p, i) => (
+                <div key={p.id} className="w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]">
+                  <ProductCard product={p} priority={i < 2} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-12 text-center">
+              <Link href="/shop" className="btn-outline">View all <ArrowRight className="size-4" /></Link>
+            </div>
           </div>
-          <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-12 sm:gap-x-6 lg:grid-cols-4">
-            {newIn.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 2} />)}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ---------- BRAND STORY ---------- */}
       <section className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-20 sm:px-8 lg:grid-cols-2 lg:py-28">
@@ -199,7 +188,7 @@ export default async function HomePage() {
             {settings.aboutImage ? (
               <Image src={settings.aboutImage} alt="Inside the Studio Glimmer studio" fill sizes="(min-width:1024px) 40vw, 90vw" className="object-cover" />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle,#fbf6ec,#dccdb1)]">
+              <div className="absolute inset-0 flex items-center justify-center bg-placeholder">
                 <Diamond className="text-rose w-1/3" strokeWidth={0.8} />
               </div>
             )}
@@ -221,18 +210,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------- FEATURED ---------- */}
-      {featured.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-8 lg:pb-28">
-          <SectionTitle eyebrow="Customer favourites" script="Most" title="Loved" />
-          <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-12 sm:gap-x-6 lg:grid-cols-4">
-            {featured.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-        </section>
-      )}
-
       {/* ---------- CUSTOM ORDER CTA ---------- */}
-      <section className="bg-bronze text-cream relative overflow-hidden">
+      <section className="keep-dark bg-bronze text-cream relative overflow-hidden">
         <Sparkle className="text-rose-light/40 animate-twinkle absolute top-10 left-[8%] size-6" />
         <Sparkle className="text-rose-light/30 animate-twinkle absolute right-[10%] bottom-12 size-10 [animation-delay:1.5s]" />
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:py-24">
@@ -276,17 +255,17 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ---------- GALLERY / INSTAGRAM ---------- */}
+      {/* ---------- INSTAGRAM (photos only once the gallery has some) ---------- */}
       <section className="bg-blush/50 py-20 lg:py-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-8 lg:grid-cols-[1fr_1.4fr]">
-          <div className="text-center lg:text-left">
+        <div className={`mx-auto items-center gap-12 px-4 sm:px-8 ${galleryShots.length === 3 ? "grid max-w-7xl lg:grid-cols-[1fr_1.4fr]" : "max-w-2xl"}`}>
+          <div className={`text-center ${galleryShots.length === 3 ? "lg:text-left" : ""}`}>
             <p className="eyebrow mb-3">Follow the sparkle</p>
             <h2 className="font-display text-bronze text-4xl sm:text-5xl">@studioglimmer.lk</h2>
-            <SparkleRule className="mt-5 lg:justify-start" />
+            <SparkleRule className={`mt-5 ${galleryShots.length === 3 ? "lg:justify-start" : ""}`} />
             <p className="text-muted mt-6 leading-relaxed">
               Behind-the-scenes, new drops and finished custom pieces — see it all first on Instagram.
             </p>
-            <div className="mt-8 flex flex-col items-center gap-6 sm:flex-row lg:items-center">
+            <div className={`mt-8 flex flex-col items-center justify-center gap-6 sm:flex-row ${galleryShots.length === 3 ? "lg:justify-start" : ""}`}>
               <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
                 <InstagramIcon className="size-4" /> Follow us
               </a>
@@ -295,13 +274,15 @@ export default async function HomePage() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            {(gallery.length ? gallery.slice(0, 6).map((g) => ({ id: g.id, src: g.image as string | undefined, alt: g.caption })) : products.slice(0, 6).map((p) => ({ id: p.id, src: p.images[0], alt: p.name }))).map((g, i) => (
-              <Link key={g.id} href="/gallery" className={`bg-blush relative aspect-square overflow-hidden ${i % 2 ? "rounded-3xl" : "rounded-t-full rounded-b-3xl"}`}>
-                <ProductVisual src={g.src} alt={g.alt} sizes="(min-width:1024px) 18vw, 30vw" className="transition-transform duration-700 hover:scale-105" />
-              </Link>
-            ))}
-          </div>
+          {galleryShots.length === 3 && (
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+              {galleryShots.map((g, i) => (
+                <Link key={g.id} href="/gallery" className={`bg-blush relative aspect-square overflow-hidden ${i % 2 ? "rounded-3xl" : "rounded-t-full rounded-b-3xl"}`}>
+                  <ProductVisual src={g.image} alt={g.caption} sizes="(min-width:1024px) 18vw, 30vw" className="transition-transform duration-700 hover:scale-105" />
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

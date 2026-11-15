@@ -68,7 +68,7 @@ export function ImageUploader({
             {i === 0 && max > 1 && (
               <span className="bg-bronze text-cream absolute top-2 left-2 rounded-full px-2 py-0.5 text-[0.6rem] tracking-wider uppercase">Main</span>
             )}
-            <div className="bg-ink/55 absolute inset-x-0 bottom-0 flex justify-between p-1.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
+            <div className="bg-black/55 absolute inset-x-0 bottom-0 flex justify-between p-1.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
               <div className="flex gap-1">
                 {i > 0 && (
                   <IconBtn label="Move left" onClick={() => move(i, -1)}><ChevronLeft className="size-3.5" /></IconBtn>
@@ -106,14 +106,14 @@ export function ImageUploader({
         )}
       </div>
       {hint && <p className="text-muted mt-2 text-xs">{hint}</p>}
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
     </div>
   );
 }
 
 function IconBtn({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} aria-label={label} className="rounded-full bg-white/90 p-1.5 text-bronze hover:bg-white">
+    <button type="button" onClick={onClick} aria-label={label} className="rounded-full bg-white/90 p-1.5 text-black hover:bg-white">
       {children}
     </button>
   );

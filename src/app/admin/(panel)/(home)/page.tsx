@@ -59,14 +59,14 @@ export default async function DashboardPage() {
       </div>
 
       {todos.length > 0 && (
-        <Card className="mt-6 !border-amber-200 !bg-amber-50/60">
+        <Card className="mt-6 !border-amber-200 !bg-amber-50/60 dark:!border-amber-900/60 dark:!bg-amber-950/30">
           <h2 className="text-bronze flex items-center gap-2 font-medium">
             <AlertTriangle className="size-4 text-amber-600" /> Before you launch
           </h2>
           <ul className="mt-3 space-y-2">
             {todos.map((t) => (
               <li key={t.text}>
-                <Link href={t.href} className="text-bronze flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm hover:bg-amber-100/60">
+                <Link href={t.href} className="text-bronze flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm hover:bg-amber-100/60 dark:hover:bg-amber-900/30">
                   {t.text} <ArrowRight className="size-4 shrink-0" />
                 </Link>
               </li>

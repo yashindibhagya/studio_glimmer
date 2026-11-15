@@ -149,7 +149,7 @@ export function CustomOrderForm({
                   URL.revokeObjectURL(p.url);
                   setPreviews((all) => all.filter((x) => x !== p));
                 }}
-                className="bg-ink/70 absolute top-1 right-1 rounded-full p-1 text-white"
+                className="bg-black/70 absolute top-1 right-1 rounded-full p-1 text-white"
                 aria-label={`Remove reference ${i + 1}`}
               >
                 <X className="size-3" />
@@ -174,7 +174,7 @@ export function CustomOrderForm({
             </label>
           )}
         </div>
-        {imgError && <p className="mt-2 text-sm text-red-700">{imgError}</p>}
+        {imgError && <p className="mt-2 text-sm text-red-700 dark:text-red-400">{imgError}</p>}
       </div>
 
       {state.error && (
@@ -194,7 +194,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
     <label className="block">
       <span className="field-label">{label}</span>
       {children}
-      {error && <span className="mt-1.5 block text-xs text-red-700">{error}</span>}
+      {error && <span className="mt-1.5 block text-xs text-red-700 dark:text-red-400">{error}</span>}
     </label>
   );
 }

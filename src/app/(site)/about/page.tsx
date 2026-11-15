@@ -21,8 +21,8 @@ export default async function AboutPage() {
               {settings.aboutImage ? (
                 <Image src={settings.aboutImage} alt="Studio Glimmer" fill priority sizes="(min-width:1024px) 40vw, 90vw" className="object-cover" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#fbf6ec,#dccdb1)]">
-                  <Image src="/logo.webp" alt="Studio Glimmer logo" width={380} height={380} priority className="w-[90%] mix-blend-multiply [mask-image:radial-gradient(circle_closest-side,black_84%,transparent_100%)]" />
+                <div className="absolute inset-0 flex items-center justify-center bg-placeholder">
+                  <Image src="/logo.webp" alt="Studio Glimmer logo" width={380} height={380} priority className="w-[90%] logo-blend [mask-image:radial-gradient(circle_closest-side,black_84%,transparent_100%)]" />
                 </div>
               )}
             </div>
@@ -46,7 +46,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      <section id="contact" className="bg-bronze text-cream mt-24 rounded-[2.5rem] px-6 py-16 text-center sm:px-12">
+      <section id="contact" className="keep-dark bg-bronze text-cream mt-24 rounded-[2.5rem] px-6 py-16 text-center sm:px-12">
         <Diamond className="text-rose-light mx-auto w-10" />
         <h2 className="font-display mt-4 text-4xl sm:text-5xl">Let&apos;s create together</h2>
         <p className="text-cream/70 mx-auto mt-4 max-w-lg">

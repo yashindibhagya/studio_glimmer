@@ -36,7 +36,7 @@ export function BagDrawer({ whatsappNumber, instagramUrl }: { whatsappNumber: st
     <div className={`fixed inset-0 z-50 ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open}>
       <OnNavigate onChange={() => setOpen(false)} />
       <div
-        className={`bg-ink/30 absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}
+        className={`bg-black/40 absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}
         onClick={() => setOpen(false)}
       />
       <aside

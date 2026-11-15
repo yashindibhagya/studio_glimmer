@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Studio Glimmer palette — warm sand + black (matches the product photos: black fabric on sand), rose-gold accents from the logo */
 @theme {
   --color-cream: #efe6d5; /* page: light sand */
@@ -47,6 +49,35 @@
   }
 }
 
+/* Dark mode: charcoal like the fabric in the photos, sand text, same rose-gold accents */
+:root {
+  --ph-1: #fbf6ec;
+  --ph-2: #eadfca;
+  --ph-3: #dccdb1;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-cream: #141210;
+  --color-ivory: #1e1b18;
+  --color-blush: #2a2621;
+  --color-blush-deep: #3b352d;
+  --color-rose: #cf9270;
+  --color-rose-deep: #e6b594;
+  --color-rose-light: #e3b89c;
+  --color-bronze: #f1e9da;
+  --color-ink: #f1e9da;
+  --color-muted: #a99e8d;
+  --color-line: #3a342c;
+  --ph-1: #322d27;
+  --ph-2: #26221e;
+  --ph-3: #1b1815;
+}
+/* Sections that are black in light mode stay dark (slightly raised) instead of flipping to sand */
+[data-theme="dark"] .keep-dark {
+  --color-bronze: #24201c;
+  --color-cream: #f1e9da;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -86,6 +117,19 @@
       linear-gradient(var(--color-cream), var(--color-cream)) padding-box,
       linear-gradient(130deg, #8f5136, #f1d0b8, #b8764f, #f6dcc8, #8f5136) border-box;
   }
+  /* Soft placeholder backdrop used behind the logo and where a photo is missing */
+  .bg-placeholder {
+    background: radial-gradient(circle at 40% 25%, var(--ph-1) 0%, var(--ph-2) 50%, var(--ph-3) 100%);
+  }
+  /* The logo file has a cream background: blend it away in both themes */
+  .logo-blend {
+    filter: brightness(1.07) contrast(1.12);
+    mix-blend-mode: multiply;
+  }
+  [data-theme="dark"] .logo-blend {
+    filter: invert(1) hue-rotate(180deg) contrast(1.7) brightness(1.25);
+    mix-blend-mode: screen;
+  }
   .eyebrow {
     font-family: var(--font-sans);
     font-size: 0.7rem;
@@ -104,8 +148,8 @@
     letter-spacing: 0.24em;
     text-transform: uppercase;
     white-space: nowrap;
-    color: #f8f2e6;
-    background: #1d1b19;
+    color: var(--color-cream);
+    background: var(--color-bronze);
     box-shadow: 0 10px 30px -14px rgb(29 27 25 / 0.7);
     transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
   }

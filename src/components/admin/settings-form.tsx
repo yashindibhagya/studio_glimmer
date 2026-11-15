@@ -152,7 +152,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
 
       <div className="bg-cream/90 border-line fixed inset-x-0 bottom-0 z-20 border-t backdrop-blur lg:left-64">
         <div className="mx-auto flex max-w-6xl items-center justify-end gap-4 px-4 py-3 sm:px-8">
-          {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="text-sm text-red-700 dark:text-red-400">{error}</p>}
           {!error && dirty && !pending && <p className="text-rose-deep text-sm">You have unsaved changes</p>}
           <button type="submit" className="btn-primary" disabled={pending}>
             {pending ? <Loader2 className="size-4 animate-spin" /> : saved ? <><Check className="size-4" /> Saved</> : "Save settings"}

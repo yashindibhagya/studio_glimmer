@@ -42,8 +42,8 @@ function ReviewEditor({ review, onDone }: { review?: Review; onDone?: () => void
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((s) => ({ ...s, [k]: v }));
 
   return (
-    <Card className={`space-y-4 ${review?.sample ? "!border-amber-300" : ""}`}>
-      {review?.sample && <p className="text-xs text-amber-800">Sample review — replace with a real one or delete it.</p>}
+    <Card className={`space-y-4 ${review?.sample ? "!border-amber-300 dark:!border-amber-800" : ""}`}>
+      {review?.sample && <p className="text-xs text-amber-800 dark:text-amber-300">Sample review — replace with a real one or delete it.</p>}
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block"><span className="field-label">Customer name</span>
           <input className="field" value={f.name} onChange={(e) => set("name", e.target.value)} maxLength={60} />

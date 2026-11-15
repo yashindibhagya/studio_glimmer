@@ -16,6 +16,7 @@ import {
   Tags,
   X,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/site/theme-toggle";
 import { logoutAction } from "@/app/admin/actions";
 import { OnNavigate, PathnameRender } from "@/components/site/pathname";
 
@@ -58,6 +59,7 @@ export function AdminNav() {
       <a href="/" target="_blank" className="text-bronze hover:bg-blush flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm">
         <ExternalLink className="size-4" strokeWidth={1.6} /> View website
       </a>
+      <ThemeToggle label className="text-bronze hover:bg-blush flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm [&_svg]:size-4" />
       <form action={logoutAction}>
         <button type="submit" className="text-bronze hover:bg-blush flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm">
           <LogOut className="size-4" strokeWidth={1.6} /> Sign out
@@ -85,7 +87,7 @@ export function AdminNav() {
       </div>
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="bg-ink/30 absolute inset-0" onClick={() => setOpen(false)} />
+          <div className="bg-black/40 absolute inset-0" onClick={() => setOpen(false)} />
           <aside className="bg-ivory absolute inset-y-0 left-0 flex w-72 flex-col gap-6 p-5">
             <div className="flex items-center justify-between">
               {brand}
