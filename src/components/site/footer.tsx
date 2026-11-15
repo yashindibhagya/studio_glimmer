@@ -18,25 +18,27 @@ export function Footer({ settings, categories }: { settings: SiteSettings; categ
 
   return (
     <footer className="print:hidden bg-blush/60 border-line mt-auto border-t">
-      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-8 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
-        <div className="flex flex-col items-center text-center md:items-start md:text-left">
-          <Image src="/logo.webp" alt="Studio Glimmer — Custom Rhinestone Creations, since 2020" width={150} height={150} className="-my-3 logo-blend" />
-          <p className="text-muted mt-4 max-w-xs text-sm leading-relaxed">
-            Handmade rhinestone creations, hand-placed stone by stone in Sri Lanka.
-          </p>
-          <div className="mt-5 flex gap-2">
-            {socials.map(({ href, label, Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="border-rose/40 text-bronze flex size-10 items-center justify-center rounded-full border transition hover:bg-bronze hover:text-cream"
-              >
-                <Icon className="size-4" />
-              </a>
-            ))}
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-8 px-5 py-10 sm:px-8 md:gap-12 md:py-16 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+        <div className="col-span-2 flex items-center gap-4 md:flex-col md:items-start md:gap-0 lg:col-span-1">
+          <Image src="/logo.webp" alt="Studio Glimmer — Custom Rhinestone Creations, since 2020" width={150} height={150} className="logo-blend -m-2 w-24 shrink-0 md:-mx-0 md:-my-3 md:w-[150px]" />
+          <div>
+            <p className="text-muted max-w-xs text-sm leading-relaxed md:mt-4">
+              Handmade rhinestone creations, hand-placed stone by stone in Sri Lanka.
+            </p>
+            <div className="mt-3 flex gap-2 md:mt-5">
+              {socials.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="border-rose/40 text-bronze flex size-10 items-center justify-center rounded-full border transition hover:bg-bronze hover:text-cream"
+                >
+                  <Icon className="size-4" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -55,7 +57,7 @@ export function Footer({ settings, categories }: { settings: SiteSettings; categ
           <FooterLink href="/wishlist">Wishlist</FooterLink>
         </FooterCol>
 
-        <FooterCol title="Information">
+        <FooterCol title="Information" wide>
           <FooterLink href="/policies/shipping">Shipping & delivery</FooterLink>
           <FooterLink href="/policies/returns">Returns & exchanges</FooterLink>
           <FooterLink href="/policies/privacy">Privacy policy</FooterLink>
@@ -65,9 +67,9 @@ export function Footer({ settings, categories }: { settings: SiteSettings; categ
         </FooterCol>
       </div>
       <div className="border-line border-t">
-        <div className="text-muted mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs sm:flex-row sm:px-8">
+        <div className="text-muted mx-auto flex max-w-7xl flex-col items-center justify-between gap-1 px-5 py-4 text-center text-xs sm:flex-row sm:px-8 md:py-5">
           <p>© Studio Glimmer · Since 2020. All rights reserved.</p>
-          <p className="flex items-center gap-2">
+          <p className="hidden items-center gap-2 sm:flex">
             <Sparkle className="text-rose size-2.5" /> Custom rhinestone creations <Sparkle className="text-rose size-2.5" />
           </p>
         </div>
@@ -76,18 +78,19 @@ export function Footer({ settings, categories }: { settings: SiteSettings; categ
   );
 }
 
-function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
+/** `wide` columns span the full width on phones and lay their links out in a wrapping row to save height. */
+function FooterCol({ title, wide = false, children }: { title: string; wide?: boolean; children: React.ReactNode }) {
   return (
-    <div className="text-center md:text-left">
-      <p className="eyebrow text-bronze mb-5">{title}</p>
-      <div className="flex flex-col gap-3">{children}</div>
+    <div className={wide ? "col-span-2 lg:col-span-1" : ""}>
+      <p className="eyebrow text-bronze mb-3 md:mb-5">{title}</p>
+      <div className={wide ? "flex flex-row flex-wrap gap-x-5 gap-y-2 md:flex-col md:gap-3" : "flex flex-col gap-2 md:gap-3"}>{children}</div>
     </div>
   );
 }
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="text-muted text-sm transition-colors hover:text-rose-deep">
+    <Link href={href} className="text-muted py-0.5 text-sm transition-colors hover:text-rose-deep">
       {children}
     </Link>
   );
