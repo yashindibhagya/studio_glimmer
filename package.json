@@ -10,6 +10,7 @@
     "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "heic-to": "^1.6.7",
     "jose": "^6.2.17",

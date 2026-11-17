@@ -101,6 +101,17 @@ export type SiteSettings = {
   policies: Record<PolicyKey, string>;
 };
 
+/** One day's visitor count for the public site. `id` is the date in Sri Lanka time, e.g. "2026-11-17". */
+export type DayVisits = {
+  id: string;
+  /** Pages opened that day. */
+  views: number;
+  /** Anonymous codes, one per person seen that day — its length is the day's visitor count. */
+  seen: string[];
+  /** Views per page address. */
+  pages: Record<string, number>;
+};
+
 export type Collections = {
   products: Product;
   categories: Category;
@@ -109,6 +120,7 @@ export type Collections = {
   faqs: Faq;
   requests: CustomRequest;
   settings: SiteSettings;
+  visits: DayVisits;
 };
 
 export type CollectionName = keyof Collections;

@@ -4,6 +4,7 @@ import { BagDrawer } from "@/components/site/bag-drawer";
 import { Footer } from "@/components/site/footer";
 import { Header } from "@/components/site/header";
 import { PromoBar } from "@/components/site/promo-bar";
+import { VisitTracker } from "@/components/site/visit-tracker";
 import { WhatsAppFloat } from "@/components/site/whatsapp-float";
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
@@ -22,6 +23,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       <Footer settings={settings} categories={categories} />
       <BagDrawer whatsappNumber={settings.whatsappNumber} />
       <WhatsAppFloat number={settings.whatsappNumber} />
+      <VisitTracker />
     </BagProvider>
   );
 }

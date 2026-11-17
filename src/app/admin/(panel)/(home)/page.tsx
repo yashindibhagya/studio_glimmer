@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowRight, Inbox, Package, Plus, Star, Images } from "l
 import { requireAdmin } from "@/lib/auth";
 import { ensureSeeded, readSettings } from "@/lib/data";
 import { store, usingCloudinary } from "@/lib/store";
+import { readVisitStats, type VisitStats } from "@/lib/visits";
 import { Card, PageHeader, StatusPill } from "@/components/admin/ui";
 
 export const metadata = { title: "Dashboard" };
@@ -10,12 +11,13 @@ export const metadata = { title: "Dashboard" };
 export default async function DashboardPage() {
   await requireAdmin();
   await ensureSeeded();
-  const [products, requests, reviews, gallery, settings] = await Promise.all([
+  const [products, requests, reviews, gallery, settings, visits] = await Promise.all([
     store.list("products"),
     store.list("requests"),
     store.list("reviews"),
     store.list("gallery"),
     readSettings(),
+    readVisitStats(),
   ]);
 
   const newRequests = requests.filter((r) => r.status === "new");
@@ -55,6 +57,8 @@ export default async function DashboardPage() {
         <Stat href="/admin/reviews" Icon={Star} label="Reviews" value={reviews.length} />
         <Stat href="/admin/gallery" Icon={Images} label="Gallery photos" value={gallery.length} />
       </div>
+
+      <Visitors stats={visits} />
 
       {todos.length > 0 && (
         <Card className="mt-6 !border-amber-200 !bg-amber-50/60 dark:!border-amber-900/60 dark:!bg-amber-950/30">
@@ -97,6 +101,71 @@ export default async function DashboardPage() {
         )}
       </Card>
     </>
+  );
+}
+
+function Visitors({ stats }: { stats: VisitStats }) {
+  const peak = Math.max(1, ...stats.daily.map((d) => d.visitors));
+  const totals = [
+    { label: "Today", ...stats.today },
+    { label: "Last 7 days", ...stats.week },
+    { label: "Last 30 days", ...stats.month },
+  ];
+
+  return (
+    <Card className="mt-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-display text-bronze text-2xl">Website visitors</h2>
+        <p className="text-muted text-xs">People who opened your site · Sri Lanka time</p>
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        {totals.map((t) => (
+          <div key={t.label} className="bg-blush/40 rounded-2xl p-4">
+            <p className="font-display text-bronze text-3xl sm:text-4xl">{t.visitors.toLocaleString("en")}</p>
+            <p className="text-muted text-xs tracking-wider uppercase">{t.label}</p>
+            <p className="text-muted mt-1 text-xs">{t.views.toLocaleString("en")} page views</p>
+          </div>
+        ))}
+      </div>
+
+      {stats.month.views === 0 ? (
+        <p className="text-muted mt-5 text-sm">
+          No visits counted yet. Numbers start appearing once customers open the live site — your own visits while
+          signed in here aren&apos;t counted.
+        </p>
+      ) : (
+        <div className="mt-6 grid gap-8 lg:grid-cols-[3fr_2fr]">
+          <div>
+            <p className="eyebrow !text-[0.65rem]">Visitors per day</p>
+            <div className="mt-3 flex h-32 items-end gap-1.5" role="img" aria-label="Visitors per day for the last 14 days">
+              {stats.daily.map((d) => (
+                <div key={d.id} className="flex h-full flex-1 flex-col justify-end" title={`${d.label}: ${d.visitors} visitors, ${d.views} page views`}>
+                  <span className="text-muted mb-1 text-center text-[0.65rem]">{d.visitors || ""}</span>
+                  <div className="bg-rose-gold min-h-0.5 rounded-t-md" style={{ height: `${(d.visitors / peak) * 80}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="text-muted mt-2 flex justify-between text-[0.65rem]">
+              <span>{stats.daily[0]?.label}</span>
+              <span>Today</span>
+            </div>
+          </div>
+
+          <div>
+            <p className="eyebrow !text-[0.65rem]">Most viewed pages · 30 days</p>
+            <ul className="mt-3 space-y-2">
+              {stats.topPages.map((p) => (
+                <li key={p.path} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-bronze truncate">{p.path === "/" ? "Home page" : p.path}</span>
+                  <span className="text-muted shrink-0 tabular-nums">{p.views.toLocaleString("en")}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }
 

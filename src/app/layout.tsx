@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Jost, Pinyon_Script } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -46,6 +47,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         {/* Applies the saved light/dark choice before the page becomes interactive. */}
         <Script src="/theme.js" strategy="beforeInteractive" />
+        {/* Counts visitors and page views; see the Analytics tab of the project on Vercel. */}
+        <Analytics />
       </body>
     </html>
   );
