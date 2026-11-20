@@ -12,6 +12,8 @@ export type Product = {
   compareAtPrice?: number | null; // original price, shown struck-through
   description: string;
   images: string[];
+  /** Cloudinary video URLs, shown after the photos on the product page. */
+  videos?: string[];
   options: ProductOption[];
   personalizable: boolean; // shows a "name / text to add" field
   personalizationLabel?: string;

@@ -9,7 +9,9 @@ import { checkCredentials, endSession, isLockedOut, requireAdmin, startSession }
 import { SITE_TAG, readSettings } from "@/lib/data";
 import { readImage } from "@/lib/images";
 import { slugify } from "@/lib/format";
-import { store } from "@/lib/store";
+import { store, usingCloudinary } from "@/lib/store";
+import { isOwnVideoUrl, signVideoUpload } from "@/lib/store/cloudinary";
+import { MAX_VIDEOS } from "@/lib/video";
 import type { Category, CustomRequest, Faq, GalleryItem, Product, Review, SiteSettings } from "@/lib/types";
 
 export type ActionResult = { ok: boolean; error?: string; id?: string };
@@ -61,6 +63,19 @@ export async function uploadImageAction(formData: FormData): Promise<{ ok: boole
   }
 }
 
+export type VideoUploadTicket = ReturnType<typeof signVideoUpload>;
+
+/** Gives the admin's browser a short-lived signature to upload one video straight to Cloudinary. */
+export async function videoUploadTicket(): Promise<{ ok: boolean; ticket?: VideoUploadTicket; error?: string }> {
+  await requireAdmin();
+  if (!usingCloudinary) return { ok: false, error: "Video uploads need Cloudinary to be set up." };
+  try {
+    return { ok: true, ticket: signVideoUpload("products") };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Could not start the upload" };
+  }
+}
+
 // ---------------------------------------------------------------- products
 
 const imageUrl = z.string().min(1).max(500).refine((u) => u.startsWith("/uploads/") || u.startsWith("https://"), "Invalid image");
@@ -74,6 +89,10 @@ const productSchema = z.object({
   compareAtPrice: z.coerce.number().int().min(0).max(10_000_000).nullable().optional(),
   description: z.string().trim().max(4000),
   images: z.array(imageUrl).max(8, "Up to 8 photos per product"),
+  videos: z
+    .array(z.string().max(500).refine(isOwnVideoUrl, "Invalid video"))
+    .max(MAX_VIDEOS, `Up to ${MAX_VIDEOS} videos per product`)
+    .default([]),
   options: z
     .array(z.object({ name: z.string().trim().min(1).max(40), values: z.array(z.string().trim().min(1).max(60)).min(1).max(30) }))
     .max(5),
@@ -109,7 +128,10 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
       sample: false,
     };
     await store.put("products", product);
-    if (existing) await removeImages(existing.images.filter((u) => !product.images.includes(u)));
+    if (existing) {
+      const kept = new Set([...product.images, ...(product.videos ?? [])]);
+      await removeImages([...existing.images, ...(existing.videos ?? [])].filter((u) => !kept.has(u)));
+    }
     refreshSite();
     return { ok: true, id: product.id };
   } catch (e) {
@@ -122,7 +144,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
   const p = await store.get("products", id);
   if (!p) return { ok: true };
   await store.remove("products", id);
-  await removeImages(p.images);
+  await removeImages([...p.images, ...(p.videos ?? [])]);
   refreshSite();
   return { ok: true };
 }

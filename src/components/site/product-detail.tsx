@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Heart, Minus, Plus, ShoppingBag, Sparkles, Truck, Hand } from "lucide-react";
+import { Check, Heart, Minus, Play, Plus, ShoppingBag, Sparkles, Truck, Hand } from "lucide-react";
+import { videoPoster } from "@/lib/video";
 import type { Product } from "@/lib/types";
 import { formatLKR } from "@/lib/format";
 import { OrderButtons } from "./order-buttons";
@@ -27,7 +28,14 @@ export function ProductDetail({
   );
   const [added, setAdded] = useState(false);
 
-  const images = product.images.length ? product.images : [null];
+  const videos = product.videos ?? [];
+  // Photos first, then videos. The placeholder only shows when there's nothing at all.
+  const photos: (string | null)[] = product.images.length ? product.images : videos.length ? [] : [null];
+  const media = [
+    ...photos.map((src) => ({ kind: "image" as const, src })),
+    ...videos.map((src) => ({ kind: "video" as const, src })),
+  ];
+  const current = media[active] ?? media[0];
   const wished = ready && wishlist.includes(product.id);
   const onSale = product.compareAtPrice && product.compareAtPrice > product.price;
 
@@ -53,23 +61,49 @@ export function ProductDetail({
       <div className="lg:sticky lg:top-28 lg:self-start">
         <div className="ring-rose-gold rounded-t-full rounded-b-[2.2rem] p-2.5">
           <div className="bg-blush relative aspect-[4/5] overflow-hidden rounded-t-full rounded-b-[1.8rem]">
-            <ProductVisual src={images[active]} alt={product.name} priority sizes="(min-width:1024px) 45vw, 95vw" />
+            {current.kind === "video" && current.src ? (
+              <video
+                key={current.src}
+                src={current.src}
+                poster={videoPoster(current.src)}
+                controls
+                playsInline
+                autoPlay
+                muted
+                loop
+                preload="metadata"
+                aria-label={`${product.name} video`}
+                className="absolute inset-0 size-full bg-black object-cover"
+              />
+            ) : (
+              <ProductVisual src={current.src} alt={product.name} priority sizes="(min-width:1024px) 45vw, 95vw" />
+            )}
           </div>
         </div>
-        {images.length > 1 && (
-          <div className="mt-4 flex justify-center gap-3">
-            {images.map((src, i) => (
+        {media.length > 1 && (
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            {media.map(({ kind, src }, i) => (
               <button
                 key={src ?? i}
                 type="button"
                 onClick={() => setActive(i)}
-                aria-label={`View photo ${i + 1}`}
+                aria-label={kind === "video" ? `Play video ${i + 1 - product.images.length}` : `View photo ${i + 1}`}
                 aria-current={i === active}
                 className={`bg-blush relative size-18 overflow-hidden rounded-2xl transition ${
                   i === active ? "ring-rose ring-2 ring-offset-2 ring-offset-cream" : "opacity-70 hover:opacity-100"
                 }`}
               >
-                <ProductVisual src={src} alt="" sizes="72px" />
+                {kind === "video" && src ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={videoPoster(src, 160)} alt="" className="size-full bg-black object-cover" />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                      <Play className="size-5 fill-white text-white" />
+                    </span>
+                  </>
+                ) : (
+                  <ProductVisual src={src} alt="" sizes="72px" />
+                )}
               </button>
             ))}
           </div>

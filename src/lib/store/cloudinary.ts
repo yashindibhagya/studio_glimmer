@@ -24,13 +24,39 @@ export function signParams(params: Record<string, string | number>, secret: stri
   return createHash("sha1").update(toSign + secret).digest("hex");
 }
 
-/** "https://res.cloudinary.com/x/image/upload/v123/studio-glimmer/products/abc.webp" → "studio-glimmer/products/abc" */
+/**
+ * "https://res.cloudinary.com/x/image/upload/v123/studio-glimmer/products/abc.webp"
+ *   → { type: "image", publicId: "studio-glimmer/products/abc" }
+ */
 export function publicIdFromUrl(url: string) {
-  const i = url.indexOf("/image/upload/");
-  if (i === -1) return null;
-  const rest = url.slice(i + "/image/upload/".length).replace(/^v\d+\//, "");
-  if (!rest.startsWith(`${ROOT_FOLDER}/`)) return null; // never delete images we didn't upload
-  return rest.replace(/\.[a-z0-9]+$/i, "");
+  const m = url.match(/^https:\/\/res\.cloudinary\.com\/[^/]+\/(image|video)\/upload\/(?:v\d+\/)?(.+)$/);
+  if (!m) return null;
+  const [, type, rest] = m;
+  if (!rest.startsWith(`${ROOT_FOLDER}/`)) return null; // never delete files we didn't upload
+  return { type: type as "image" | "video", publicId: rest.replace(/\.[a-z0-9]+$/i, "") };
+}
+
+/**
+ * Signs a direct browser → Cloudinary video upload. Videos are too big to pass
+ * through our own server, so the admin's browser sends them straight to Cloudinary.
+ */
+export function signVideoUpload(folder: string) {
+  const { cloud, key, secret } = cloudinaryConfig();
+  const params = { folder: `${ROOT_FOLDER}/${folder}`, timestamp: Math.floor(Date.now() / 1000) };
+  return {
+    uploadUrl: `https://api.cloudinary.com/v1_1/${cloud}/video/upload`,
+    apiKey: key,
+    folder: params.folder,
+    timestamp: params.timestamp,
+    signature: signParams(params, secret),
+  };
+}
+
+/** True only for videos uploaded to this shop's Cloudinary folder. */
+export function isOwnVideoUrl(url: string) {
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME;
+  const id = publicIdFromUrl(url);
+  return !!cloud && url.startsWith(`https://res.cloudinary.com/${cloud}/video/upload/`) && id?.type === "video";
 }
 
 export async function uploadImage(bytes: Uint8Array, contentType: string, folder: string) {
@@ -49,9 +75,11 @@ export async function uploadImage(bytes: Uint8Array, contentType: string, folder
   return json.secure_url;
 }
 
+/** Deletes a photo or video we uploaded (works out which from the URL). */
 export async function deleteImage(url: string) {
-  const publicId = publicIdFromUrl(url);
-  if (!publicId) return;
+  const id = publicIdFromUrl(url);
+  if (!id) return;
+  const { publicId, type } = id;
   const { cloud, key, secret } = cloudinaryConfig();
   const params = { public_id: publicId, timestamp: Math.floor(Date.now() / 1000) };
   const form = new FormData();
@@ -59,5 +87,5 @@ export async function deleteImage(url: string) {
   form.append("api_key", key);
   form.append("timestamp", String(params.timestamp));
   form.append("signature", signParams(params, secret));
-  await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/destroy`, { method: "POST", body: form });
+  await fetch(`https://api.cloudinary.com/v1_1/${cloud}/${type}/destroy`, { method: "POST", body: form });
 }

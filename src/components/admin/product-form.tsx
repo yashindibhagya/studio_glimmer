@@ -7,6 +7,7 @@ import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import type { Product, ProductOption } from "@/lib/types";
 import { saveProduct, type ProductInput } from "@/app/admin/actions";
 import { ImageUploader } from "./image-uploader";
+import { VideoUploader } from "./video-uploader";
 import { Card, Toggle } from "./ui";
 
 export function ProductForm({ product, categories }: { product?: Product; categories: { id: string; name: string }[] }) {
@@ -22,6 +23,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
     compareAtPrice: product?.compareAtPrice ? String(product.compareAtPrice) : "",
     description: product?.description ?? "",
     images: product?.images ?? [],
+    videos: product?.videos ?? [],
     options: product?.options ?? ([] as ProductOption[]),
     personalizable: product?.personalizable ?? false,
     personalizationLabel: product?.personalizationLabel ?? "",
@@ -75,6 +77,10 @@ export function ProductForm({ product, categories }: { product?: Product; catego
 
         <Card>
           <ImageUploader value={f.images} onChange={(v) => set("images", v)} folder="products" />
+        </Card>
+
+        <Card>
+          <VideoUploader value={f.videos} onChange={(v) => set("videos", v)} />
         </Card>
 
         <Card className="space-y-5">
